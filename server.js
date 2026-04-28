@@ -27,33 +27,31 @@ app.get("/", (req, res) => {
 // 🔥 Save Order API
 app.post("/order", async (req, res) => {
   try {
-    const order = req.body;
+    const { name, address, phone, product } = req.body;
 
-    // Basic validation
-    if (!order.name || !order.address || !order.product) {
-      return res.status(400).json({ error: "Missing required fields" });
+    // 🔥 VALIDATION
+    if (!name || !address || !phone || !product) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
+
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      return res.status(400).json({ error: "Invalid phone number" });
     }
 
     const docRef = await db.collection("orders").add({
-      ...order,
+      ...req.body,
       status: "NEW",
       createdAt: new Date()
     });
 
-    console.log("📦 Order saved:", docRef.id);
-
-    res.json({
-      success: true,
-      orderId: docRef.id
-    });
+    res.json({ success: true, orderId: docRef.id });
 
   } catch (err) {
-    console.error("❌ Firebase Error:", err);
-    res.status(500).json({ error: "Failed to save order" });
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
   }
 });
-
-// ✅ Start server
+✅ Start server
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
