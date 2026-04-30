@@ -50,6 +50,15 @@ app.post("/order", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Server error" });
   }
+})
+
+
+app.get("/orders/:phone", async (req, res) => {
+  const orders = await db.collection("orders")
+    .find({ phone: req.params.phone })
+    .toArray();
+
+  res.json(orders);
 });
 ✅ Start server
 const PORT = process.env.PORT || 3000;
